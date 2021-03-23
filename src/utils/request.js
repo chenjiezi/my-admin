@@ -1,5 +1,5 @@
 import axios from 'axios'
-
+import { Message } from 'view-design';
 const service = axios.create({
   // TODO:配置请求url
   baseURL: '/',
@@ -26,7 +26,8 @@ service.interceptors.response.use(
   },
   error => {
     console.log(error) // for debug
-    // TODO:统一处理错误信息
+    
+    Message.error('请求失败');
     return Promise.reject(error)
   }
 )
