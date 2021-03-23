@@ -3,9 +3,21 @@
   <div class="container">
       <div class="content">
         <h1>Login</h1>
-        <Input v-model="loginname" placeholder="账号/用户名" class="item" />
-        <Input v-model="password" type="password" password placeholder="密码" class="item" />
-        <Button @click="loginFunc" type="primary" class="item">登录</Button>
+        <Form ref="formInline" :model="formInline" :rules="ruleInline" class="form">
+          <FormItem prop="user">
+              <Input ref="user" type="text" v-model="formInline.user" placeholder="用户名">
+                  <Icon type="ios-person-outline" slot="prepend"></Icon>
+              </Input>
+          </FormItem>
+          <FormItem prop="password">
+              <Input ref="password" type="password" v-model="formInline.password" placeholder="Password">
+                  <Icon type="ios-lock-outline" slot="prepend"></Icon>
+              </Input>
+          </FormItem>
+          <FormItem>
+              <Button :loading="loading" type="primary" @click="handleSubmit('formInline')" class="login-btn">登录</Button>
+          </FormItem>
+      </Form>
       </div>
   </div>
 </div>
@@ -16,14 +28,48 @@ export default {
   name: 'Login',
   data () {
     return {
-      loginname: '',
-      password: ''
+      loading: false,
+      formInline: {
+          user: 'admin',
+          password: 'admin'
+      },
+      ruleInline: {
+          user: [
+              { required: true, message: '请输入用户名!', trigger: 'blur' }
+          ],
+          password: [
+              { required: true, message: '请输入密码!', trigger: 'blur' },
+              // { type: 'string', min: 5, message: '密码不少于五位!', trigger: 'blur' }
+          ]
+      }
+    }
+  },
+  mounted () {
+    if (this.formInline.user === '') {
+      this.$refs.user.focus();
+    } else if (this.formInline.password === '') {
+      this.$refs.password.focus();
     }
   },
   methods: {
-    loginFunc () {
-      console.log('this.loginname:', this.loginname);
-      console.log('this.password:', this.password);
+    handleSubmit(name) {
+      this.$refs[name].validate((valid) => {
+        if (valid) {
+          this.loading = true;
+
+          this.$store.dispatch('login', this.formInline)
+            .then(() => {
+              this.$router.push({ path: '/' });
+              this.$Message.success('登录成功!');
+            })
+            .catch(({ message }) => {
+              this.$Message.error(message);
+            })
+            .finally(() => {
+              this.loading = false;
+            })
+        }
+      })
     }
   }
 }
@@ -39,16 +85,16 @@ export default {
     background-image url('../assets/bg3.jpg')
     background-size cover
     .content
-      display flex
-      align-items center
-      flex-direction column
       width 450px
       height 300px
       padding-top 50px
       background-color rgba(0,0,0, .8)
       color #fff
-      & > *
-        margin-bottom 20px
-      .item
-        width 350px
+      h1
+        text-align center
+      .form
+        margin-top 20px
+        padding 0 20px
+        .login-btn
+          width 100%
 </style>

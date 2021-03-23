@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import Login from '../views/Login.vue'
+import store from '@/store';
 
 Vue.use(VueRouter)
 
@@ -39,10 +40,10 @@ const router = new VueRouter({
   routes
 })
 
-// 登录令牌
-const hasToken = false;
 
 router.beforeEach((to, from, next) => {
+  const hasToken = store.getters.token; // 登录凭证
+
   if (to.name !== 'Login' && !hasToken) { // 没有令牌，跳转到登录页面
     next({path: '/login'});
   } else if (to.name == 'Login' && hasToken) { // 有令牌，访问登录页面，直接跳转到首页
